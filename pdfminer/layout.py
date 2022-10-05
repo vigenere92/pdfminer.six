@@ -1,3 +1,4 @@
+import copy
 import heapq
 import logging
 from typing import (
@@ -376,9 +377,18 @@ class LTChar(LTComponent, LTText):
             bbox_lower_left = (0, rise)
             bbox_upper_right = (self.adv, fontsize/2 + rise)
         (a, b, c, d, e, f) = self.matrix
+
+        # Don't apply scaling the co-ordinates
+        self.new_matrix = copy.deepcopy(list(self.matrix))
+        for index in [1,3]:
+            if self.new_matrix[index] > 0:
+                self.new_matrix[index] = 1
+            elif self.new_matrix[index] < 0:
+                self.new_matrix[index] = -1
+
         self.upright = 0 < a * d * scaling and b * c <= 0
-        (x0, y0) = apply_matrix_pt(self.matrix, bbox_lower_left)
-        (x1, y1) = apply_matrix_pt(self.matrix, bbox_upper_right)
+        (x0, y0) = apply_matrix_pt(self.new_matrix, bbox_lower_left)
+        (x1, y1) = apply_matrix_pt(self.new_matrix, bbox_upper_right)
         if x1 < x0:
             (x0, x1) = (x1, x0)
         if y1 < y0:
