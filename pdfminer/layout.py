@@ -15,6 +15,7 @@ from typing import (
     Union,
     cast,
 )
+import math
 
 from .pdfcolor import PDFColorSpace
 from .pdffont import PDFFont
@@ -377,14 +378,14 @@ class LTChar(LTComponent, LTText):
             bbox_lower_left = (0, rise)
             bbox_upper_right = (self.adv, fontsize/2 + rise)
         (a, b, c, d, e, f) = self.matrix
-
+        
         # Don't apply scaling the co-ordinates
         self.new_matrix = copy.deepcopy(list(self.matrix))
         for index in [1,3]:
             if self.new_matrix[index] > 0:
-                self.new_matrix[index] = 1
+                self.new_matrix[index] = math.ceil(self.new_matrix[index])
             elif self.new_matrix[index] < 0:
-                self.new_matrix[index] = -1
+                self.new_matrix[index] = -1 * math.ceil(abs(self.new_matrix[index]))
 
         self.upright = 0 < a * d * scaling and b * c <= 0
         (x0, y0) = apply_matrix_pt(self.new_matrix, bbox_lower_left)
